@@ -1385,7 +1385,7 @@
   (symbol (lib_id "Device:R") (at 66.04 53.34 0) (unit 1)
     (in_bom yes) (on_board yes) (fields_autoplaced)
     (uuid 94a7379f-0759-4af3-b86c-c3a01b2bb6ad)
-    (property "Reference" "R?" (id 0) (at 68.58 52.0699 0)
+    (property "Reference" "R6" (id 0) (at 68.58 52.0699 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "5k6" (id 1) (at 68.58 54.6099 0)
@@ -1625,7 +1625,7 @@
       (reference "R5") (unit 1) (value "5k6") (footprint "Resistor_SMD:R_0805_2012Metric")
     )
     (path "/94a7379f-0759-4af3-b86c-c3a01b2bb6ad"
-      (reference "R?") (unit 1) (value "5k6") (footprint "Resistor_SMD:R_0805_2012Metric")
+      (reference "R6") (unit 1) (value "5k6") (footprint "Resistor_SMD:R_0805_2012Metric")
     )
     (path "/100708ee-4125-4f5a-b2e4-ac3378e710a6"
       (reference "U1") (unit 1) (value "MCP1703A-5002_SOT223") (footprint "Package_TO_SOT_SMD:SOT-223-3_TabPin2")
