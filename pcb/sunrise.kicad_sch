@@ -1681,7 +1681,7 @@
   (symbol (lib_id "Interface_Optical:TSOP312xx") (at 208.28 44.45 0) (unit 1)
     (in_bom yes) (on_board yes) (fields_autoplaced)
     (uuid a92c3364-2905-48b6-9985-28ad44e8c845)
-    (property "Reference" "U?" (id 0) (at 206.545 33.02 0))
+    (property "Reference" "U2" (id 0) (at 206.545 33.02 0))
     (property "Value" "TSOP312xx" (id 1) (at 206.545 35.56 0))
     (property "Footprint" "OptoDevice:Vishay_CAST-3Pin" (id 2) (at 207.01 53.975 0)
       (effects (font (size 1.27 1.27)) hide)
@@ -1924,7 +1924,7 @@
       (reference "U1") (unit 1) (value "MCP1703A-5002_SOT223") (footprint "Package_TO_SOT_SMD:SOT-223-3_TabPin2")
     )
     (path "/a92c3364-2905-48b6-9985-28ad44e8c845"
-      (reference "U?") (unit 1) (value "TSOP312xx") (footprint "OptoDevice:Vishay_CAST-3Pin")
+      (reference "U2") (unit 1) (value "TSOP312xx") (footprint "OptoDevice:Vishay_CAST-3Pin")
     )
   )
 )
