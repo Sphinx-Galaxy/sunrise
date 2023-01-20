@@ -6,3 +6,12 @@
  *
  */
  
+#pragma once
+
+ // Timer construct
+ 
+ // Time light correlation array
+ 
+ // Get absolute time
+ 
+ // Set alarm time
