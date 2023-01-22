@@ -8,15 +8,12 @@
  
 #include "led_stripe.h"
 
+#include "esp_err.h"
+
 void init_led_stripe() {
-	led_stripe.settings = led_stripe_settings;
-
-	init_led(0, LEDC_RED_CHANNEL);
-
-	led_stripe.set_red = &set_red;
-	led_stripe.set_green = &set_green;
-	led_stripe.set_blue = &set_blue;
-	led_stripe.set_speed = &set_speed;
+	init_led(LEDC_RED_GPIO, LEDC_RED_CHANNEL);
+	init_led(LEDC_GREEN_GPIO, LEDC_GREEN_CHANNEL);
+	init_led(LEDC_BLUE_GPIO, LEDC_BLUE_CHANNEL);
 }
  
 void init_led(int gpio, int channel)
@@ -44,27 +41,17 @@ void init_led(int gpio, int channel)
     ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel));
 }
 
-void set_red(uint8_t value) {
-	led_stripe_settings.red = value;
-	
-	ledc_set_duty(LEDC_MODE, LEDC_RED_CHANNEL, value);
-	ledc_update_duty(LEDC_MODE, LEDC_RED_CHANNEL);
+void set_red_led_duty(uint8_t duty) {
+	ESP_ERROR_CHECK(ledc_set_duty(LEDC_MODE, LEDC_RED_CHANNEL, 8191.0 * duty / 100.0));
+	ESP_ERROR_CHECK(ledc_update_duty(LEDC_MODE, LEDC_RED_CHANNEL));
 }
 
-void set_green(uint8_t value) {
-	led_stripe_settings.green = value;
-	
-	// Set PWM
+void set_green_led_duty(uint8_t duty) {
+	ESP_ERROR_CHECK(ledc_set_duty(LEDC_MODE, LEDC_GREEN_CHANNEL, 8191.0 * duty / 100.0));
+	ESP_ERROR_CHECK(ledc_update_duty(LEDC_MODE, LEDC_GREEN_CHANNEL));
 }
 
-void set_blue(uint8_t value) {
-	led_stripe_settings.blue = value;
-	
-	// Set PWM
-}
-
-void set_speed(uint8_t value) {
-	led_stripe_settings.speed = value;
-	
-	// Set PWM
+void set_blue_led_duty(uint8_t duty) {
+	ESP_ERROR_CHECK(ledc_set_duty(LEDC_MODE, LEDC_BLUE_CHANNEL, 8191.0 * duty / 100.0));
+	ESP_ERROR_CHECK(ledc_update_duty(LEDC_MODE, LEDC_BLUE_CHANNEL));
 }
