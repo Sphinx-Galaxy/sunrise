@@ -35,7 +35,6 @@ void time_sync_notification_cb(struct timeval* tv) {
 }
 
 void test_alarm(void) {
-
     time_t now;
     struct tm timeinfo;
     time(&now);
@@ -49,27 +48,6 @@ void test_alarm(void) {
         time(&now);
     }
 
-/*#ifdef CONFIG_SNTP_TIME_SYNC_METHOD_SMOOTH
-    else {
-        // add 500 ms error to the current system time.
-        // Only to demonstrate a work of adjusting method!
-        {
-            ESP_LOGI(TAG, "Add a error for test adjtime");
-            struct timeval tv_now;
-            gettimeofday(&tv_now, NULL);
-            int64_t cpu_time = (int64_t)tv_now.tv_sec * 1000000L + (int64_t)tv_now.tv_usec;
-            int64_t error_time = cpu_time + 500 * 1000L;
-            struct timeval tv_error = { .tv_sec = error_time / 1000000L, .tv_usec = error_time % 1000000L };
-            settimeofday(&tv_error, NULL);
-        }
-
-        ESP_LOGI(TAG, "Time was set, now just adjusting it. Use SMOOTH SYNC method.");
-        obtain_time();
-        // update 'now' variable with current time
-        time(&now);
-    }
-#endif*/
-
     char strftime_buf[64];
 
 	// Set timezone to UTC
@@ -78,49 +56,13 @@ void test_alarm(void) {
 	localtime_r(&now, &timeinfo);
     strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
     ESP_LOGI(TAG, "The current date/time in DEUTSCHLAND is %s", strftime_buf);
-/*
-    if (sntp_get_sync_mode() == SNTP_SYNC_MODE_SMOOTH) {
-        struct timeval outdelta;
-        while (sntp_get_sync_status() == SNTP_SYNC_STATUS_IN_PROGRESS) {
-            adjtime(NULL, &outdelta);
-            ESP_LOGI(TAG, "Waiting for adjusting time ... outdelta = %jd sec: %li ms: %li us",
-                        (intmax_t)outdelta.tv_sec,
-                        outdelta.tv_usec/1000,
-                        outdelta.tv_usec%1000);
-            vTaskDelay(2000 / portTICK_PERIOD_MS);
-        }
-    }
-*/
+
     const int deep_sleep_sec = 10;
     ESP_LOGI(TAG, "Entering deep sleep for %d seconds", deep_sleep_sec);
     esp_deep_sleep(1000000LL * deep_sleep_sec);
 }
 
 void obtain_time() {
-	// This should be done before as we are connecting to wifi anyway
-   // ESP_ERROR_CHECK( nvs_flash_init() );
-   // ESP_ERROR_CHECK(esp_netif_init());
-   // ESP_ERROR_CHECK( esp_event_loop_create_default() );
-
-    /**
-     * NTP server address could be aquired via DHCP,
-     * see following menuconfig options:
-     * 'LWIP_DHCP_GET_NTP_SRV' - enable STNP over DHCP
-     * 'LWIP_SNTP_DEBUG' - enable debugging messages
-     *
-     * NOTE: This call should be made BEFORE esp aquires IP address from DHCP,
-     * otherwise NTP option would be rejected by default.
-     */
-#ifdef LWIP_DHCP_GET_NTP_SRV
-    sntp_servermode_dhcp(1);      // accept NTP offers from DHCP server, if any
-#endif
-
-    /* This helper function configures Wi-Fi or Ethernet, as selected in menuconfig.
-     * Read "Establishing Wi-Fi or Ethernet Connection" section in
-     * examples/protocols/README.md for more information about this function.
-     */
-    //ESP_ERROR_CHECK(example_connect());
-
     initialize_sntp();
 
     // wait for time to be set
@@ -134,41 +76,13 @@ void obtain_time() {
     }
     time(&now);
     localtime_r(&now, &timeinfo);
-
-    //ESP_ERROR_CHECK( example_disconnect() );
 }
 
 void initialize_sntp() {
     ESP_LOGI(TAG, "Initializing SNTP");
     sntp_setoperatingmode(SNTP_OPMODE_POLL);
-
-/*
- * If 'NTP over DHCP' is enabled, we set dynamic pool address
- * as a 'secondary' server. It will act as a fallback server in case that address
- * provided via NTP over DHCP is not accessible
- */
-//#if LWIP_DHCP_GET_NTP_SRV && SNTP_MAX_SERVERS > 1
-    sntp_setservername(1, "pool.ntp.org");
-
-/*#if LWIP_IPV6 && SNTP_MAX_SERVERS > 2          // statically assigned IPv6 address is also possible*/
-/*    ip_addr_t ip6;*/
-/*    if (ipaddr_aton("2a01:3f7::1", &ip6)) {    // ipv6 ntp source "ntp.netnod.se"*/
-/*        sntp_setserver(2, &ip6);*/
-/*    }*/
-//#endif  /* LWIP_IPV6 */
-
-// No else needed
-//#else   /* LWIP_DHCP_GET_NTP_SRV && (SNTP_MAX_SERVERS > 1) */
-    // otherwise, use DNS address from a pool
     sntp_setservername(0, CONFIG_SNTP_TIME_SERVER);
-
-    sntp_setservername(1, "pool.ntp.org");     // set the secondary NTP server (will be used only if SNTP_MAX_SERVERS > 1)
-//#endif
-
     sntp_set_time_sync_notification_cb(time_sync_notification_cb);
-/*#ifdef CONFIG_SNTP_TIME_SYNC_METHOD_SMOOTH
-    sntp_set_sync_mode(SNTP_SYNC_MODE_SMOOTH);
-#endif*/
     sntp_init();
 
     ESP_LOGI(TAG, "List of configured NTP servers:");
