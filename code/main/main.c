@@ -24,54 +24,38 @@
  // Set via WIFI
  
  void sunrise() {
+	//TODO Stop this task if the remote has been used
+	
  	// Duty Cycle: 
  	// 1, 2, 3, 4, 5, 6, 7, 9, 10
  	// 10, 20, 30, 40, 50, 60, 70, 80, 90, 100
  	
+ 	// Reset the stripe
+	set_led_on((bool [3]){false, false, false});
+ 	set_led_duty((uint8_t [3]){0, 0, 0});
+	set_led_on((bool [3]){true, true, true});
+	
  	for(uint8_t i = 1; i < 10; i++) {
- 		set_red_led_duty(i); // 1 .. 9
- 		
- 		if(i >= 5) {
- 			set_green_led_duty(i - 4); // 1 .. 5
- 		}
- 		
-	    vTaskDelay(60*1000 / portTICK_PERIOD_MS);
+ 		set_led_duty((uint8_t [3]){i, (i >= 5 ? i-4 : 0), 0});
+	    vTaskDelay(1000 / portTICK_PERIOD_MS);
  	}
  	
- 	for(uint8_t i = 1; i < 11; i++) {
- 		set_red_led_duty(i * 10); // 10 .. 100
- 		
- 		if(i < 5) {
-	 		set_green_led_duty(i + 5); // 6  ... 9
-	 	}
-	 	else {
-	 		set_green_led_duty((i - 5) * 10); // 10  ... 50	 	
-	 	}
-	 	
- 		set_blue_led_duty(i); // 1 ... 10
- 		
-	    vTaskDelay(60*1000 / portTICK_PERIOD_MS);
+ 	for(uint8_t i = 1; i < 11; i++) { 		
+ 		set_led_duty((uint8_t [3]){i*10, (i <= 5 ? i + 5 : (i - 5) * 10), i});
+	    vTaskDelay(1000 / portTICK_PERIOD_MS);
  	}
  }
   
 void app_main(void) {
- 	//init_led_stripe();
- 	
-	//sunrise(); // Move this to an interrupt with time
-
-	test_wifi();
+	init_led_stripe();
+	init_remote_control();
 	
-	test_alarm();
-
-
-/*	init_led_stripe();*/
-/*	*/
-/*	for(int i = 0; i < 10; ++i) {*/
-/*		set_red_led_duty(i * 10);*/
-/*	}*/
-		
-	
- 	// Initialize stuff
- 
- 	// Go to sleep
+	// Init the wifi and to get the time
+	// test_wifi()
+	while(true) {
+		if(true) { // Check for 6 Uhr
+			sunrise();
+		}
+		// Sleep
+	}
  }

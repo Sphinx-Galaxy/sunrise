@@ -3,4 +3,8 @@ idf_component_register(SRCS "main.c"
 							"alarm_clock.c"
 							"remote_control.c"
 							"wifi_control.c"
+							"ir_builder_rmt_nec.c"
+							"ir_builder_rmt_rc5.c"
+							"ir_parser_rmt_nec.c"
+							"ir_parser_rmt_rc5.c"
                     INCLUDE_DIRS ".")

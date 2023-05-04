@@ -9,9 +9,8 @@
 #pragma once
 
 #include "led_stripe.h"
- 
-// Remote control struct
 
-// Decoding array
+#define IR_REMOTE_GPIO (15)
+#define IR_REMOTE_ADDR (0xef00)
 
-struct led_stripe_settings decode_remote_controller(uint8_t* input, uint8_t size);
+void init_remote_control();
