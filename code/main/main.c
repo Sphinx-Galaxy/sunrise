@@ -13,9 +13,16 @@
  #include "wifi_control.h"
  
 #include "esp_err.h"
+#include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
+#include <stdio.h>
+#include <string.h>
+#include <sys/time.h>
+#include <time.h>
+
+static const char* TAG = "MAIN";
 
  // Interrupt for LED remote controller
  
@@ -35,27 +42,67 @@
  	set_led_duty((uint8_t [3]){0, 0, 0});
 	set_led_on((bool [3]){true, true, true});
 	
- 	for(uint8_t i = 1; i < 10; i++) {
- 		set_led_duty((uint8_t [3]){i, (i >= 5 ? i-4 : 0), 0});
+ 	for(uint8_t i = 1; i < 101; i++) {
+ 		set_led_duty((uint8_t [3]){i, 0, 0});
 	    vTaskDelay(1000 / portTICK_PERIOD_MS);
  	}
  	
- 	for(uint8_t i = 1; i < 11; i++) { 		
- 		set_led_duty((uint8_t [3]){i*10, (i <= 5 ? i + 5 : (i - 5) * 10), i});
+ 	for(uint8_t i = 1; i < 101; i++) {
+ 		set_led_duty((uint8_t [3]){100, i, 0});
+	    vTaskDelay(1000 / portTICK_PERIOD_MS);
+ 	}
+ 	
+ 	for(uint8_t i = 1; i < 101; i++) {
+ 		set_led_duty((uint8_t [3]){100, 100, i});
 	    vTaskDelay(1000 / portTICK_PERIOD_MS);
  	}
  }
   
 void app_main(void) {
+	/* Setup LED stripe and remote control */
 	init_led_stripe();
 	init_remote_control();
 	
-	// Init the wifi and to get the time
-	// test_wifi()
+	/* Init the wifi and to get the time */
+	init_wifi();
+	init_alarm();
+	
+	/* Set timer */
+	time_t now = 0;
+    struct tm timeinfo = { 0 };
+    
+    time(&now);
+    localtime_r(&now, &timeinfo);
+    
+    if(timeinfo.tm_hour > 6) {
+    	now += 24*60*60;
+   		localtime_r(&now, &timeinfo);
+    }
+    
+    timeinfo.tm_hour = 5;
+    timeinfo.tm_min = 55;
+    timeinfo.tm_sec = 0;
+    time_t alarm_time = mktime(&timeinfo);
+		
+	/* Wait for timer */
 	while(true) {
-		if(true) { // Check for 6 Uhr
-			sunrise();
+		time(&now);
+		ESP_LOGI(TAG, "Time Now: %d; Alarm at: %d; Remaining: %d", (int)now, (int)alarm_time, (int)(alarm_time-now));	
+		
+		if(now > alarm_time) { // Check for 6 Uhr
+			sunrise();    
+			
+			/* Set next alarm */
+			time(&now);			
+			now += 24*60*60;
+			localtime_r(&now, &timeinfo);
+			
+			timeinfo.tm_hour = 5;
+			timeinfo.tm_min = 55;
+			timeinfo.tm_sec = 0;
+			time_t alarm_time = mktime(&timeinfo);    
 		}
-		// Sleep
+		vTaskDelay(60*1000 / portTICK_PERIOD_MS);
 	}
+
  }
