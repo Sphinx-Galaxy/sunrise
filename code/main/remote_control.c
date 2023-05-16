@@ -46,11 +46,7 @@ static uint32_t receive_remote_control(RingbufHandle_t* rb, ir_parser_t* ir_pars
 	}
 	
 	// Ignore every cmd that is not for us
-	if(addr != IR_REMOTE_ADDR) {
-		return 0;
-	}
-	
-	return cmd;
+	return (addr == IR_REMOTE_ADDR ? cmd : 0);
 }
 
 static void decode_remote_control(uint32_t cmd) {
@@ -68,21 +64,77 @@ static void decode_remote_control(uint32_t cmd) {
 		case 0xfe01:
 			decrease_duty();
 			break;
+			
+		/* White column */
 		case 0xf807:
 			set_led_on((bool [3]){true, true, true});
 			set_led_duty((uint8_t [3]){100, 100, 100});
 			break;
+			
+		/* Red column */
 		case 0xfb04:
 			set_led_on((bool [3]){true, false, false});
 			set_led_duty((uint8_t [3]){100, 0, 0});
 			break;
+		case 0xf708:
+			set_led_on((bool [3]){true, true, false});
+			set_led_duty((uint8_t [3]){100, 10, 0});
+			break;		
+		case 0xf30c:
+			set_led_on((bool [3]){true, true, false});
+			set_led_duty((uint8_t [3]){100, 20, 0});
+			break;				
+		case 0xef10:
+			set_led_on((bool [3]){true, true, false});
+			set_led_duty((uint8_t [3]){100, 30, 0});
+			break;		
+		case 0xeb14:
+			set_led_on((bool [3]){true, true, false});
+			set_led_duty((uint8_t [3]){100, 50, 0});
+			break;			
+			
+		/* Green column */
 		case 0xfa05:
 			set_led_on((bool [3]){false, true, false});
 			set_led_duty((uint8_t [3]){0, 100, 0});
+			break;		
+		case 0xf609:
+			set_led_on((bool [3]){false, true, true});
+			set_led_duty((uint8_t [3]){0, 100, 20});
+			break;		
+		case 0xf20d:
+			set_led_on((bool [3]){false, true, true});
+			set_led_duty((uint8_t [3]){0, 100, 40});
+			break;		
+		case 0xee11:
+			set_led_on((bool [3]){false, true, true});
+			set_led_duty((uint8_t [3]){0, 100, 60});
+			break;		
+		case 0xea15:
+			set_led_on((bool [3]){false, true, true});
+			set_led_duty((uint8_t [3]){0, 100, 100});
 			break;
+		
+		/* Blue column */
 		case 0xf906:
 			set_led_on((bool [3]){false, false, true});
 			set_led_duty((uint8_t [3]){0, 0, 100});
+			break;		
+		case 0xf50a:
+			set_led_on((bool [3]){true, false, true});
+			set_led_duty((uint8_t [3]){20, 0, 100});
+			break;		
+		case 0xf10e:
+			set_led_on((bool [3]){true, false, true});
+			set_led_duty((uint8_t [3]){40, 0, 100});
+			break;		
+		case 0xed12:
+			set_led_on((bool [3]){true, false, true});
+			set_led_duty((uint8_t [3]){60, 0, 100});
+			break;		
+		case 0xe916:
+			set_led_on((bool [3]){true, false, true});
+			set_led_duty((uint8_t [3]){100, 0, 100});
 			break;
 	}
 	
@@ -109,7 +161,10 @@ static void handle_remote_control(void *arg) {
 
 	while (1) {
 		uint32_t cmd = receive_remote_control(rb, ir_parser);
-		decode_remote_control(cmd);
+		
+		if(cmd != 0) {
+			decode_remote_control(cmd);
+		}
 	}
 	
 	ir_parser->del(ir_parser);

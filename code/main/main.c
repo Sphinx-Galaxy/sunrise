@@ -37,6 +37,8 @@ static const char* TAG = "MAIN";
  	// 1, 2, 3, 4, 5, 6, 7, 9, 10
  	// 10, 20, 30, 40, 50, 60, 70, 80, 90, 100
  	
+ 	uint8_t scale = 10;
+ 	
  	// Reset the stripe
 	set_led_on((bool [3]){false, false, false});
  	set_led_duty((uint8_t [3]){0, 0, 0});
@@ -44,17 +46,23 @@ static const char* TAG = "MAIN";
 	
  	for(uint8_t i = 1; i < 101; i++) {
  		set_led_duty((uint8_t [3]){i, 0, 0});
-	    vTaskDelay(1000 / portTICK_PERIOD_MS);
+	    vTaskDelay(scale * 100 / portTICK_PERIOD_MS);
  	}
  	
- 	for(uint8_t i = 1; i < 101; i++) {
+ 	for(uint8_t i = 1; i < 11; i++) {
  		set_led_duty((uint8_t [3]){100, i, 0});
-	    vTaskDelay(1000 / portTICK_PERIOD_MS);
+	    vTaskDelay(scale * 10 * 100 / portTICK_PERIOD_MS);
  	}
  	
  	for(uint8_t i = 1; i < 101; i++) {
- 		set_led_duty((uint8_t [3]){100, 100, i});
-	    vTaskDelay(1000 / portTICK_PERIOD_MS);
+ 		if(i < 10) {
+	 		set_led_duty((uint8_t [3]){100, (i + 10), i}); 		
+ 		}
+ 		else {
+	 		set_led_duty((uint8_t [3]){100, (i < 50 ? i * 2 : 100), i}); 
+ 		}
+ 		
+	    vTaskDelay(scale * 100 / portTICK_PERIOD_MS);
  	}
  }
   
@@ -100,9 +108,9 @@ void app_main(void) {
 			timeinfo.tm_hour = 5;
 			timeinfo.tm_min = 55;
 			timeinfo.tm_sec = 0;
-			time_t alarm_time = mktime(&timeinfo);    
+			alarm_time = mktime(&timeinfo);    
 		}
 		vTaskDelay(60*1000 / portTICK_PERIOD_MS);
+		init_alarm();
 	}
-
  }

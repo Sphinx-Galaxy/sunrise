@@ -9,6 +9,9 @@
 #include "led_stripe.h"
 
 #include "esp_err.h"
+#include "esp_log.h"
+
+static const char* TAG = "LED_STRIPE";
 
 void init_led_stripe() {
 	init_led(LEDC_RED_GPIO, LEDC_RED_CHANNEL);
@@ -43,6 +46,7 @@ void init_led(int gpio, int channel)
 
 void set_led_on(bool led_on[LEDC_SIZE]) {
 	for(uint8_t i = 0; i < LEDC_SIZE; ++i) {
+		ESP_LOGI(TAG, "Set LED %d %s", i, (led_on[i] ? "on" : "off"));
 		led_stripe.led_on[i] = led_on[i];
 	}
 	
@@ -52,6 +56,7 @@ void set_led_on(bool led_on[LEDC_SIZE]) {
 void set_led_duty(uint8_t led_duty[LEDC_SIZE]) {	
 	for(uint8_t i = 0; i < LEDC_SIZE; ++i) {
 		led_stripe.led_duty[i] = led_duty[i];
+		ESP_LOGI(TAG, "Set LED %d duty %d", i, led_duty[i]);	
 		
 		if(led_stripe.led_on[i]) {
 			ESP_ERROR_CHECK(ledc_set_duty(LEDC_MODE, 
