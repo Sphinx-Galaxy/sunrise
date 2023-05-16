@@ -21,8 +21,7 @@
 void obtain_time();
 void initialize_sntp();
 
-
-void test_alarm();
+void init_alarm();
 
  // Timer construct
  
